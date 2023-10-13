@@ -19,7 +19,7 @@ function Modal({ largeImageURL, tags, closeModalFunction }) {
     return () => {
       document.removeEventListener('keydown', closeModalByEsc);
     };
-  }, []);
+  }, [closeModalByEsc]);
 
   return (
     <Overlay onClick={closeModal}>
