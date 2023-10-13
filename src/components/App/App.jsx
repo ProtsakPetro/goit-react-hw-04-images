@@ -1,120 +1,96 @@
-import { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '../Button/Button';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import Modal from '../Modal/Modal';
 import Searchbar from '../SearchBar/SearchBar';
 import { Container } from './App.styled';
-import { getImages } from 'components/api/pixabay-api';
+import { getImages } from 'components/pixabay-api';
 import { Oval } from 'react-loader-spinner';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-class App extends Component {
-  state = {
-    images: [],
-    error: false,
-    loader: false,
-    searchQuery: '',
-    isShowModal: false,
-    imageForModal: '',
-    page: 1,
-    totalHits: null,
-    result: null,
-  };
+const App = () => {
+  const [images, setImages] = useState([]);
+  const [error, setError] = useState(false);
+  const [loader, setLoader] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isShowModal, setIsShowModal] = useState(false);
+  const [imageForModal, setImageForModal] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalHits, setTotalHits] = useState(null);
+  const [result, setResult] = useState(null);
 
-  componentDidUpdate(_, prevState) {
-    if (
-      prevState.searchQuery !== this.state.searchQuery ||
-      prevState.page !== this.state.page
-    )
-      this.getInputImages();
-  }
+  useEffect(() => {
+    if (searchQuery || page > 1) {
+      getInputImages();
+    }
+  }, [searchQuery, page]);
 
-  getInputImages = async () => {
+  const getInputImages = async () => {
     try {
-      this.setState({ loader: true });
-      const { data } = await getImages(this.state.searchQuery, this.state.page);
+      setLoader(true);
+      const { data } = await getImages(searchQuery, page);
       if (data.hits.length < 1) {
         Notify.info("Sorry, but we can't find any images for your request");
         return;
       }
-      this.setState(prevState => ({
-        images: [...prevState.images, ...data.hits],
-        result: this.state.page * 12,
-        totalHits: data.totalHits,
-      }));
+      setImages((prevImages) => [...prevImages, ...data.hits]);
+      setResult(page * 12);
+      setTotalHits(data.totalHits);
     } catch (error) {
-      this.setState({ error: true });
+      setError(true);
     } finally {
-      this.setState({
-        loader: false,
-      });
+      setLoader(false);
     }
   };
 
-  addInputData = searchQuery => {
-    this.setState({
-      searchQuery,
-      images: [],
-      page: 1,
-    });
+  const addInputData = (searchQuery) => {
+    setSearchQuery(searchQuery);
+    setImages([]);
+    setPage(1);
   };
 
-  getModalPhoto = image => {
-    this.setState({
-      imageForModal: image,
-      isShowModal: true,
-    });
+  const getModalPhoto = (image) => {
+    setImageForModal(image);
+    setIsShowModal(true);
   };
 
-  closeModal = () => {
-    this.setState({ isShowModal: false });
+  const closeModal = () => {
+    setIsShowModal(false);
   };
 
-  getMorePhoto = () => {
-    this.setState(({ page }) => ({ page: page + 1 }));
+  const getMorePhoto = () => {
+    setPage((prevPage) => prevPage + 1);
   };
 
-  render() {
-    const {
-      images,
-      loader,
-      error,
-      isShowModal,
-      imageForModal,
-      totalHits,
-      result,
-    } = this.state;
-    const { addInputData, getModalPhoto, getMorePhoto, closeModal } = this;
-    return (
-      <Container>
-        <Searchbar onSubmit={addInputData} />
-        {images && images.length > 0 && (
-          <ImageGallery images={images} getModalPhoto={getModalPhoto} />
-        )}
-        {loader && (
-          <Oval
-            height={90}
-            width={90}
-            color="#696"
-            wrapperStyle={{ margin: '200px auto' }}
-            wrapperClass=""
-            visible={true}
-            ariaLabel="oval-loading"
-            secondaryColor="#696"
-            strokeWidth={2}
-            strokeWidthSecondary={2}
-          />
-        )}
-        {error && <p>Sory! Something went wrong...</p>}
-        {images && images.length > 0 && result < totalHits && (
-          <Button getMorePhoto={getMorePhoto} />
-        )}
-        {isShowModal && (
-          <Modal largeImageURL={imageForModal} closeModal={closeModal} />
-        )}
-      </Container>
-    );
-  }
-}
+  return (
+    <Container>
+      <Searchbar onSubmit={addInputData} />
+      {images && images.length > 0 && (
+        <ImageGallery images={images} getModalPhoto={getModalPhoto} />
+      )}
+      {loader && (
+        <Oval
+          height={90}
+          width={90}
+          color="#696"
+          wrapperStyle={{ margin: '200px auto' }}
+          wrapperClass=""
+          visible={true}
+          ariaLabel="oval-loading"
+          secondaryColor="#696"
+          strokeWidth={2}
+          strokeWidthSecondary={2}
+        />
+      )}
+      {error && <p>Sory! Something went wrong...</p>}
+      {images && images.length > 0 && result < totalHits && (
+        <Button getMorePhoto={getMorePhoto} />
+      )}
+      {isShowModal && (
+        <Modal largeImageURL={imageForModal} closeModal={closeModal} />
+      )}
+    </Container>
+  );
+};
 
 export default App;
