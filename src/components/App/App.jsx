@@ -23,7 +23,7 @@ const App = () => {
     if (searchQuery || page > 1) {
       getInputImages();
     }
-  }, [searchQuery, page]);
+  }, [searchQuery, page, getInputImages]);
 
   const getInputImages = async () => {
     try {
