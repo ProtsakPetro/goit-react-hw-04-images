@@ -1,18 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { Overlay, ModalStyle } from './Modal.styled';
 
-function Modal({ largeImageURL, tags, closeModalFunction }) {
-  const closeModalByEsc = (event) => {
-    if (event.code === 'Escape') {
-      closeModalFunction();
-    }
-  };
-
-  const closeModal = (event) => {
-    if (event.target === event.currentTarget) {
-      closeModal();
-    }
-  };
+function Modal({ largeImageURL, tags, closeModal }) {
+  const closeModalByEsc = useCallback((event) => {
+    if (event.code === 'Escape') closeModal();
+  }, [closeModal]);
 
   useEffect(() => {
     document.addEventListener('keydown', closeModalByEsc);
@@ -21,8 +13,12 @@ function Modal({ largeImageURL, tags, closeModalFunction }) {
     };
   }, [closeModalByEsc]);
 
+  const handleModalClose = ({ target, currentTarget }) => {
+    if (target === currentTarget) closeModal();
+  };
+
   return (
-    <Overlay onClick={closeModal}>
+    <Overlay onClick={handleModalClose}>
       <ModalStyle>
         <img src={largeImageURL} alt={tags} />
       </ModalStyle>
