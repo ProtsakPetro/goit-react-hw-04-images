@@ -4,7 +4,7 @@ import ImageGallery from '../ImageGallery/ImageGallery';
 import Modal from '../Modal/Modal';
 import Searchbar from '../SearchBar/SearchBar';
 import { Container } from './App.styled';
-import { getImages } from 'components/pixabay-api';
+import { getImages } from 'pixabay-api';
 import { Oval } from 'react-loader-spinner';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
