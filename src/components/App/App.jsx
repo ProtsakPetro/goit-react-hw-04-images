@@ -19,12 +19,6 @@ const App = () => {
   const [totalHits, setTotalHits] = useState(null);
   const [result, setResult] = useState(null);
 
-  useEffect(() => {
-    if (searchQuery || page > 1) {
-      getInputImages();
-    }
-  }, [searchQuery, page, getInputImages]);
-
   const getInputImages = async () => {
     try {
       setLoader(true);
@@ -42,6 +36,12 @@ const App = () => {
       setLoader(false);
     }
   };
+
+  useEffect(() => {
+    if (searchQuery || page > 1) {
+      getInputImages();
+    }
+  }, [searchQuery, page]);
 
   const addInputData = (searchQuery) => {
     setSearchQuery(searchQuery);
@@ -82,7 +82,7 @@ const App = () => {
           strokeWidthSecondary={2}
         />
       )}
-      {error && <p>Sory! Something went wrong...</p>}
+      {error && <p>Sorry! Something went wrong...</p>}
       {images && images.length > 0 && result < totalHits && (
         <Button getMorePhoto={getMorePhoto} />
       )}
