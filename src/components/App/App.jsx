@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Button from '../Button/Button';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import Modal from '../Modal/Modal';
@@ -8,7 +8,7 @@ import { getImages } from 'pixabay-api';
 import { Oval } from 'react-loader-spinner';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-const App = () => {
+function App() {
   const [images, setImages] = useState([]);
   const [error, setError] = useState(false);
   const [loader, setLoader] = useState(false);
@@ -19,7 +19,7 @@ const App = () => {
   const [totalHits, setTotalHits] = useState(null);
   const [result, setResult] = useState(null);
 
-  const getInputImages = async () => {
+  const getInputImages = useCallback(async () => {
     try {
       setLoader(true);
       const { data } = await getImages(searchQuery, page);
@@ -35,13 +35,13 @@ const App = () => {
     } finally {
       setLoader(false);
     }
-  };
+  }, [searchQuery, page]);
 
   useEffect(() => {
     if (searchQuery || page > 1) {
       getInputImages();
     }
-  }, [searchQuery, page]);
+  }, [searchQuery, page, getInputImages]);
 
   const addInputData = (searchQuery) => {
     setSearchQuery(searchQuery);
@@ -91,6 +91,6 @@ const App = () => {
       )}
     </Container>
   );
-};
+}
 
 export default App;
